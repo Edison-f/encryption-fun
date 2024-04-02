@@ -13,3 +13,5 @@ encryption-fun <cipher>
 # Available ciphers
 
 - RC4
+- TEA
+- A5/1

@@ -14,9 +14,9 @@ pub(crate) fn rc4_runner() {
     if key.len() % 2 != 0 {
         key.push('0');
     }
-    
-    
-    println!("Enter your plaintext");
+
+
+    println!("Enter your plaintext/ciphertext, start with 0x for hex mode");
     let _ = stdout().flush();
     let mut plaintext = String::new();
     stdin().read_line(&mut plaintext).expect("Problem reading string");
@@ -26,6 +26,20 @@ pub(crate) fn rc4_runner() {
     if let Some('\r') = plaintext.chars().next_back() {
         plaintext.pop();
     }
+    let plaintext = if &plaintext[0..2] == "0x" {
+        if plaintext.len() % 2 != 0 {
+            plaintext = plaintext + "0";
+        }
+        let mut i = 2;
+        let mut res = Vec::new();
+        while i < plaintext.len() {
+            res.push(u8::from_str_radix(&plaintext[i..i + 2], 16).unwrap_or(0));
+            i += 2;
+        }
+        res
+    } else {
+        plaintext.into_bytes()
+    };
 
     println!("Enter # of discarded keystream bytes");
     let _ = stdout().flush();
@@ -37,10 +51,10 @@ pub(crate) fn rc4_runner() {
     if let Some('\r') = discard.chars().next_back() {
         discard.pop();
     }
-    let key = generate_keystream(key, discard, plaintext.as_bytes().len());
+    let key = generate_keystream(key, discard, plaintext.len());
     println!("Ciphertext:\n");
-    for i in 0..plaintext.as_bytes().len() {
-        print!("{}", &format!("{:#04x}", plaintext.as_bytes()[i] ^ key[i])[2..4].to_uppercase());
+    for i in 0..plaintext.len() {
+        print!("{}", &format!("{:#04x}", plaintext[i] ^ key[i])[2..4].to_uppercase());
     }
 }
 
