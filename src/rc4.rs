@@ -30,7 +30,7 @@ pub(crate) fn rc4_runner() {
     }
     let plaintext = if &plaintext[0..2] == "0x" {
         if plaintext.len() % 2 != 0 {
-            plaintext = plaintext + "0";
+            plaintext += "0";
         }
         let mut i = 2;
         let mut res = Vec::new();
@@ -61,7 +61,7 @@ pub(crate) fn rc4_runner() {
 }
 
 pub(crate) fn generate_keystream(key: String, discard: String, text_len: usize) -> Vec<u8> {
-    let discard = u64::from_str_radix(&*discard, 10).unwrap_or_else(|_| {
+    let discard = discard.parse::<u64>().unwrap_or_else(|_| {
         println!("Discard amount automatically set to 0");
         0
     });
@@ -107,5 +107,5 @@ pub(crate) fn generate_keystream(key: String, discard: String, text_len: usize) 
             keystream.push(s[t as usize]);
         }
     }
-    return keystream;
+    keystream
 }

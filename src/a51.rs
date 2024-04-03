@@ -35,7 +35,7 @@ pub(crate) fn a51_runner() {
     if let Some('\r') = frame.chars().next_back() {
         frame.pop();
     }
-    let mut frame = u32::from_str_radix(frame.as_str(), 10).unwrap_or(0);
+    let mut frame = frame.parse::<u32>().unwrap_or(0);//u32::from_str_radix(frame.as_str(), 10).unwrap_or(0);
     if frame > 4194303 {
         frame = 0;
         println!("Frame number out of bounds, set to zero")
@@ -53,7 +53,7 @@ pub(crate) fn a51_runner() {
     }
     let plaintext = if &plaintext[0..2] == "0x" {
         if plaintext.len() % 2 != 0 {
-            plaintext = plaintext + "0";
+            plaintext += "0";
         }
         let mut i = 2;
         let mut res = Vec::new();
@@ -78,7 +78,7 @@ pub(crate) fn a51_runner() {
 
 fn setup(key: u64, frame: u32) -> Vec<u64> {
     let feedback_locs = vec![vec![13, 16, 17, 18], vec![20, 21], vec![7, 20, 21, 22]];
-    let masks = vec![0x7FFFF, 0x3FFFFF, 0x7FFFFF];
+    let masks = [0x7FFFF, 0x3FFFFF, 0x7FFFFF];
     let mut regs = vec![0, 0, 0];
     for i in 0..64 { // Clock while inserting key bits
         for j in 0..regs.len() {
@@ -94,7 +94,7 @@ fn setup(key: u64, frame: u32) -> Vec<u64> {
         }
     }
 
-    let clock_locs = vec![8, 10, 10];
+    let clock_locs = [8, 10, 10];
     for _ in 0..100 { // Clock 100 times using majority rule
         let majority = majority(regs.clone()); // Could probably tweak majority() to remove clone
         for i in 0..3 {
@@ -112,13 +112,13 @@ fn clock(reg: u64, feedback_locs: &Vec<u8>, mask: &u64, input: u8) -> u64 {
     for loc in feedback_locs {
         next_bit ^= read_pos(reg, *loc);
     }
-    return ((reg << 1) | next_bit as u64) & *mask;
+    ((reg << 1) | next_bit as u64) & *mask
 }
 
 pub(crate) fn generate_keystream(mut regs: Vec<u64>, length: usize) -> Vec<u8> {
     let feedback_locs = vec![vec![13, 16, 17, 18], vec![20, 21], vec![7, 20, 21, 22]];
-    let masks = vec![0x7FFFF, 0x3FFFFF, 0x7FFFFF];
-    let clock_locs = vec![8, 10, 10];
+    let masks = [0x7FFFF, 0x3FFFFF, 0x7FFFFF];
+    let clock_locs = [8, 10, 10];
     let mut result = Vec::new();
     for _ in 0..length {
         let mut byte = 0u8;
@@ -129,7 +129,6 @@ pub(crate) fn generate_keystream(mut regs: Vec<u64>, length: usize) -> Vec<u8> {
                     regs[k] = clock(regs[k], &feedback_locs[k], &masks[k], 0);
                 }
             }
-            println!("{} {} {}", read_pos(regs[0], 18), read_pos(regs[1], 21), read_pos(regs[2], 22));
             byte |=
                 (read_pos(regs[0], 18)
                     ^ read_pos(regs[1], 21)
