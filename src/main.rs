@@ -4,8 +4,9 @@ mod rc4;
 mod tea;
 mod a51;
 
-// Todo: Add ECB, CBC, CTR modes if applicable
-
+/** Todo:   Add ECB, CTR, CBC modes if applicable
+            Add util file for common actions like XORing keystream or getting input
+ */
 fn main() {
     let args: Vec<_> = env::args().collect();
     if args.len() > 1 {
@@ -15,6 +16,9 @@ fn main() {
             }
             "tea" => {
                 tea::tea_runner()
+            }
+            "a5/1" => {
+                a51::a51_runner()
             }
             _ => {
                 println!("Cipher unknown/unsupported")

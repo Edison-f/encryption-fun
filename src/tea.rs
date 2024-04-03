@@ -1,6 +1,6 @@
 use std::io::{stdin, stdout, Write};
 
-// TODO: Add variable round count
+// TODO: Add variable round count, could also use wrapping to make things nicer
 
 pub(crate) fn tea_runner() {
     println!("You really don't want to rely on this, TEA implementations seem to vary");

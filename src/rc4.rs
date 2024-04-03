@@ -1,5 +1,7 @@
 use std::io::{stdin, stdout, Write};
 
+// Todo: add plaintext output for ciphertext
+
 pub(crate) fn rc4_runner() {
     println!("Enter your key (Read as hex, padded to even len w/ 0 if needed)");
     let _ = stdout().flush();
@@ -52,7 +54,7 @@ pub(crate) fn rc4_runner() {
         discard.pop();
     }
     let key = generate_keystream(key, discard, plaintext.len());
-    println!("Ciphertext:\n");
+    print!("\nCiphertext:\n0x");
     for i in 0..plaintext.len() {
         print!("{}", &format!("{:#04x}", plaintext[i] ^ key[i])[2..4].to_uppercase());
     }
