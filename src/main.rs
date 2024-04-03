@@ -3,6 +3,7 @@ use std::env;
 mod rc4;
 mod tea;
 mod a51;
+mod substitution;
 
 /** Todo:   Add ECB, CTR, CBC modes if applicable
             Add util file for common actions like XORing keystream or getting input

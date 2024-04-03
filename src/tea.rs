@@ -68,12 +68,10 @@ pub(crate) fn tea_encrypt(key: Vec<u32>, plaintext: Vec<(u32, u32)>) {
             sum = (sum + delta as u64) % modulus;
             left = (left
                 + ((((right << 4) + key[0] as u64) % modulus)
-                ^ ((right + sum) % modulus)
-                ^ (((right >> 5) + key[1] as u64) % modulus))) % modulus;
+                ^ ((right + sum) % modulus) ^ (((right >> 5) + key[1] as u64) % modulus))) % modulus;
             right = (right
                 + ((((left << 4) + key[2] as u64) % modulus)
-                ^ ((left + sum) % modulus)
-                ^ ((left >> 5) + key[3] as u64) % modulus)) % modulus;
+                ^ ((left + sum) % modulus) ^ (((left >> 5) + key[3] as u64) % modulus))) % modulus;
         }
         for byte in Vec::from((left as u32).to_be_bytes()) {
             print!("{}", format!("{:#04x}", byte)[2..4].to_string())
