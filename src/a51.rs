@@ -5,6 +5,7 @@ use std::io::{stdin, stdout, Write};
 // http://koclab.cs.ucsb.edu/teaching/cren/project/2017/jensen+andersen.pdf
 
 // This could be a variant of A5/1 or original A5/1, I'm not sure
+// Comparing with the asecuritysite.com implementation, there is something wrong with reading the key
 
 pub(crate) fn a51_runner() {
     println!("Enter your key as hex (Truncated/padded to 64 bits/8 bytes with 0)");
@@ -68,9 +69,6 @@ pub(crate) fn a51_runner() {
 
     let regs = setup(key, frame);
     let keystream = generate_keystream(regs, plaintext.len());
-    for byte in &keystream {
-        println!("{}", byte)
-    }
     for i in 0..keystream.len() {
         print!("{}", &format!("{:#04x}", plaintext[i] ^ keystream[i])[2..4].to_uppercase());
     }
@@ -99,7 +97,7 @@ fn setup(key: u64, frame: u32) -> Vec<u64> {
         let majority = majority(regs.clone()); // Could probably tweak majority() to remove clone
         for i in 0..3 {
             if read_pos(regs[i], clock_locs[i]) == majority {
-                clock(regs[i], &feedback_locs[i], &masks[i], 0);
+                regs[i] = clock(regs[i], &feedback_locs[i], &masks[i], 0);
             }
         }
     }
@@ -122,7 +120,7 @@ pub(crate) fn generate_keystream(mut regs: Vec<u64>, length: usize) -> Vec<u8> {
     let mut result = Vec::new();
     for _ in 0..length {
         let mut byte = 0u8;
-        for j in 0..8 { // may need to reverse depending on little/big endian
+        for j in 0..8 {
             let majority = majority(regs.clone());
             for k in 0..3 {
                 if read_pos(regs[k], clock_locs[k]) == majority {
@@ -132,7 +130,7 @@ pub(crate) fn generate_keystream(mut regs: Vec<u64>, length: usize) -> Vec<u8> {
             byte |=
                 (read_pos(regs[0], 18)
                     ^ read_pos(regs[1], 21)
-                    ^ read_pos(regs[2], 22)) << j;
+                    ^ read_pos(regs[2], 22)) << (7 - j);
         }
         result.push(byte);
     }

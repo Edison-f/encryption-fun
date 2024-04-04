@@ -21,6 +21,9 @@ fn main() {
             "a5/1" => {
                 a51::a51_runner()
             }
+            "substitution" => {
+                substitution::substitution_runner();
+            }
             _ => {
                 println!("Cipher unknown/unsupported")
             }
